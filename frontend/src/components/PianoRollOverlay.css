@@ -1,0 +1,101 @@
+/* src/components/PianoRollOverlay.css */
+
+.piano-roll-container {
+  background: transparent; padding: 0; margin-top: 40px; color: #fff; border: none; box-shadow: none;
+}
+
+.piano-roll-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+.piano-roll-header h3 {
+  font-size: 1.3rem; font-weight: 700; color: var(--text-muted-purple); text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* 核心滚动区域：科幻屏幕 */
+.daw-wrapper {
+  width: 100%; height: 380px; 
+  overflow-x: auto; overflow-y: hidden; position: relative;
+  background: #0d0416; /* 更深的屏幕底色 */
+  border-radius: 20px;
+  border: 3px solid rgba(99, 102, 241, 0.3); /* 发光边框 */
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(99, 102, 241, 0.2);
+}
+.daw-content { position: relative; }
+
+/* 网格：精细的科幻线条 */
+.grid-row {
+  position: absolute; left: 0; right: 0; width: 100%;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; padding-left: 10px;
+}
+.black-key { background-color: rgba(20, 10, 35, 0.6); }
+.white-key { background-color: transparent; }
+
+.key-label { font-size: 10px; color: var(--text-muted-purple); font-weight: 800; opacity: 0.7; }
+
+.grid-vertical-line {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background-color: rgba(255, 255, 255, 0.08); pointer-events: none;
+}
+.time-label { position: absolute; top: 2px; left: 4px; font-size: 9px; color: var(--text-muted-purple); }
+
+/* --- 音符块 (霓虹能量块) --- */
+.note-block {
+  position: absolute; border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900;
+  transition: transform 0.05s, box-shadow 0.05s; 
+  backdrop-filter: blur(2px);
+}
+
+/* 🟢 Standard (Sample) -> 绿色霓虹 */
+.note-block.sample {
+  background: rgba(16, 185, 129, 0.2); /* Emerald */
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+  z-index: 1; 
+}
+.note-block.sample.active-glow {
+  background: var(--neon-green); color: #000;
+  box-shadow: 0 0 25px var(--neon-green);
+  transform: scale(1.05); z-index: 50;
+}
+
+/* 🔵 Practice (You) -> 蓝色霓虹 */
+.note-block.practice {
+  background: rgba(59, 130, 246, 0.3); /* Blue */
+  border: 1px solid var(--neon-blue);
+  color: var(--text-glow-light);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  z-index: 10;
+}
+.note-block.practice.active-glow {
+  background: var(--neon-blue);
+  box-shadow: 0 0 30px var(--neon-blue);
+  border-color: #93c5fd; transform: scale(1.1); z-index: 50;
+}
+.note-text { pointer-events: none; text-shadow: 0 0 5px currentColor; }
+
+/* 播放头：激光束 */
+.playhead {
+  position: absolute; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(to bottom, var(--neon-pink), var(--neon-purple)); /* 渐变激光 */
+  z-index: 100; pointer-events: none;
+  box-shadow: 0 0 15px var(--neon-pink);
+  will-change: left;
+}
+.playhead-cap {
+  width: 0; height: 0; 
+  border-left: 8px solid transparent; border-right: 8px solid transparent; 
+  border-top: 10px solid var(--neon-pink);
+  position: absolute; left: -6.5px; top: -2px;
+  filter: drop-shadow(0 0 5px var(--neon-pink));
+}
+
+/* 图例 */
+.legend { display: flex; gap: 15px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
+.dot { width: 12px; height: 12px; border-radius: 4px; margin-right: 8px; box-shadow: 0 0 5px currentColor; }
+.dot.sample-dot { background: var(--neon-green); border: none; } 
+.dot.practice-dot { background: var(--neon-blue); }

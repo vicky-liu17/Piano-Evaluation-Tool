@@ -1,0 +1,61 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  /* --- 核心深色系 --- */
+  --bg-cosmic-dark: #0a0118; /* 最深的宇宙底色 */
+  --bg-cosmic-light: #1a0b2e; /* 稍亮的星云色 */
+  --bg-panel-dark: rgba(20, 10, 40, 0.85); /* 半透明深色面板 */
+  
+  /* --- 霓虹强调色 --- */
+  --neon-purple: #d946ef;   /* Fuchsia 500 */
+  --neon-pink: #ec4899;     /* Pink 500 */
+  --neon-blue: #3b82f6;     /* Blue 500 (Practice) */
+  --neon-green: #10b981;    /* Emerald 500 (Standard) */
+  --neon-gold: #fbbf24;     /* Amber 400 (Stars) */
+
+  /* --- 文本颜色 --- */
+  --text-glow-light: #f0e7ff; /* 发光白 */
+  --text-muted-purple: #a78bfa; /* 柔和紫 */
+  
+  /* --- 游戏化圆角 & 边框 --- */
+  --radius-lg: 24px;
+  --radius-xl: 36px;
+  
+  /* --- 霓虹光影 --- */
+  --glow-purple: 0 0 20px rgba(217, 70, 239, 0.4), inset 0 0 10px rgba(217, 70, 239, 0.2);
+  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.2);
+  --shadow-panel: 0 20px 50px -10px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  /* 深邃的宇宙渐变背景 */
+  background: linear-gradient(135deg, var(--bg-cosmic-dark) 0%, var(--bg-cosmic-light) 100%);
+  color: var(--text-glow-light);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  /* 可选：添加星星背景图 */
+  /* background-image: url('/path/to/stars.png'); background-blend-mode: overlay; */
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+/* 简单的弹跳动画 */
+@keyframes bounceIn {
+  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+  60% { opacity: 1; transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

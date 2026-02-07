@@ -1,0 +1,175 @@
+/* --- 变量定义 (假设您已定义，补充以防万一) --- */
+:root {
+  --neon-purple: #d946ef;
+  --neon-pink: #f472b6;
+  --neon-blue: #3b82f6;
+  --bg-panel-dark: rgba(30, 20, 50, 0.7);
+  --bg-cosmic-dark: #0f0720;
+  --text-muted-purple: #a78bfa;
+  --text-glow-light: #f5f3ff;
+  --radius-xl: 30px;
+  --glow-purple: 0 0 20px rgba(217, 70, 239, 0.4);
+  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* 头部：发光标题 */
+.app-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.app-header h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 15px;
+  background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(217, 70, 239, 0.3));
+}
+.app-header p {
+  color: var(--text-muted-purple);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* --- 上传卡片区域 --- */
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+.upload-card {
+  background: var(--bg-panel-dark);
+  border-radius: var(--radius-xl);
+  padding: 50px 30px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.upload-card:hover { transform: translateY(-8px); }
+
+.upload-card.sample-theme.completed { border-color: var(--neon-purple); box-shadow: var(--glow-purple); }
+.upload-card.practice-theme.completed { border-color: var(--neon-blue); box-shadow: var(--glow-blue); }
+
+.icon-wrapper {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 25px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.upload-card h3 { font-size: 1.5rem; color: #fff; margin-bottom: 10px; }
+.upload-card p { color: var(--text-muted-purple); margin-bottom: 30px; }
+
+/* 按钮：上传按钮 */
+.file-label {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative; z-index: 10;
+}
+.sample-theme .file-label { background: linear-gradient(to right, var(--neon-purple), var(--neon-pink)); color: #fff; }
+.practice-theme .file-label { background: linear-gradient(to right, var(--neon-blue), #60a5fa); color: #fff; }
+.file-label:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+.filename {
+  margin-top: 20px; display: block; font-size: 0.85rem; color: var(--text-muted-purple);
+  background: rgba(0,0,0,0.3); padding: 8px; border-radius: 10px;
+}
+
+/* 分割线 */
+.demo-divider { display: flex; align-items: center; margin: 25px 0 15px; }
+.demo-divider::before, .demo-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+.demo-divider span { padding: 0 10px; color: var(--text-muted-purple); font-size: 0.75rem; font-weight: 700; }
+
+/* 基础 Demo 按钮 (用于左侧卡片) */
+.btn-demo {
+  background: transparent; border: 1px dashed var(--text-muted-purple);
+  color: var(--text-muted-purple); padding: 10px 20px; border-radius: 30px;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+}
+.btn-demo:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+
+/* 🆕 并排按钮组 (用于右侧卡片) */
+.demo-btn-group {
+  display: flex;
+  width: 100%;
+  max-width: 240px; /* 缩小宽度 */
+  margin: 0 auto;
+  border: 1px dashed var(--text-muted-purple);
+  border-radius: 15px; /* 圆角矩形 */
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-demo-split {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted-purple);
+  padding: 10px 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: all 0.2s;
+}
+
+/* 中间分割线 */
+.btn-demo-split:first-child {
+  border-right: 1px dashed var(--text-muted-purple);
+}
+
+.btn-demo-split:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #fff;
+}
+
+.btn-demo-split:active { background: rgba(59, 130, 246, 0.2); }
+
+/* --- 开始按钮 --- */
+.action-area { text-align: center; margin-top: 40px; }
+.btn-start {
+  background: linear-gradient(to right, #6366f1, var(--neon-purple));
+  color: white; padding: 20px 60px; font-size: 1.4rem; border-radius: 50px;
+  font-weight: 800; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 12px;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); transition: all 0.2s;
+}
+.btn-start:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6); }
+.btn-start:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* --- 结果页与其他 --- */
+.track-section {
+  background: rgba(20, 10, 35, 0.6); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);
+}
+.track-label {
+  font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px;
+}
+.standard .track-label { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+.practice .track-label { color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+
+.loading-text { margin-top: 30px; color: #f0e7ff; font-weight: 800; font-size: 1.8rem; text-shadow: 0 0 20px var(--neon-purple); }
+
+.animate-spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

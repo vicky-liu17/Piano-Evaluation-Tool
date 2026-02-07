@@ -1,0 +1,55 @@
+/* src/components/ScorePanel.css */
+.score-panel {
+  background: rgba(20, 10, 40, 0.85);
+  border-radius: 36px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.1);
+  margin-bottom: 50px;
+}
+
+.score-panel h2 {
+  color: #a78bfa; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+}
+
+.score-circle {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  display: flex; justify-content: center; align-items: center;
+  margin: 0 auto 10px auto;
+  border: 8px solid;
+}
+
+.score-grade {
+  font-size: 5rem; font-weight: 900;
+}
+
+/* 星星网格 */
+.stars-grid {
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 300px;
+  margin: 0 auto 30px auto;
+}
+
+.star-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.star-row:last-child { margin-bottom: 0; }
+
+.star-label {
+  color: #e2e8f0; font-weight: 700; font-size: 1rem;
+}
+.stars { display: flex; gap: 4px; }
+
+.retry-btn {
+  background: rgba(255,255,255,0.1); color: white;
+  padding: 12px 30px; border-radius: 50px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: inline-flex; gap: 10px; transition: all 0.2s;
+}
+.retry-btn:hover { background: rgba(255,255,255,0.2); }
