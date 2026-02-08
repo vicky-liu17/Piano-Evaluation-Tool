@@ -1,9 +1,11 @@
+// App.jsx
 import React, { useState } from 'react';
-import { analyzeAudio, compareAudio } from './api/index.js';
+// 引入 analyzeRhythm
+import { analyzeAudio, compareAudio, analyzeRhythm } from './api/index.js';
 import Waveform from './components/Waveform';
 import PianoRollOverlay from './components/PianoRollOverlay';
 import ScorePanel from './components/ScorePanel';
-import { Music, ArrowRight, Loader2, UploadCloud, Activity, Sparkles } from 'lucide-react';
+import { Music, ArrowRight, Loader2, UploadCloud, Sparkles } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -12,27 +14,29 @@ function App() {
   const [sampleData, setSampleData] = useState(null);
   const [practiceFile, setPracticeFile] = useState(null);
   const [practiceData, setPracticeData] = useState(null);
-  
+
   // --- 结果状态 ---
   const [dtwResult, setDtwResult] = useState(null);
-  
+  // 🆕 新增：存储节奏分析数据
+  const [rhythmData, setRhythmData] = useState(null);
+
   // --- 播放同步状态 ---
   const [currentTime, setCurrentTime] = useState(0);
   const [activeTrack, setActiveTrack] = useState(null); // 'sample' | 'practice' | null
 
   // --- UI 状态 ---
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
 
   // --- 通用处理逻辑 ---
-  
+
   const processFile = async (file, type) => {
     try {
       if (type === 'sample') setSampleFile(file);
       else setPracticeFile(file);
 
       const data = await analyzeAudio(file);
-      
+
       if (type === 'sample') setSampleData(data);
       else setPracticeData(data);
     } catch (error) {
@@ -67,13 +71,20 @@ function App() {
 
   const startEvaluation = async () => {
     if (!sampleFile || !practiceFile) return;
-    setStep(2); 
+    setStep(2);
     try {
-      const result = await compareAudio(sampleFile, practiceFile);
-      setDtwResult(result);
-      setStep(3); 
+      // 🆕 修改：并行调用 DTW 对比和节奏分析
+      const [dtwRes, rhythmRes] = await Promise.all([
+        compareAudio(sampleFile, practiceFile),
+        analyzeRhythm(sampleFile, practiceFile)
+      ]);
+
+      setDtwResult(dtwRes);
+      setRhythmData(rhythmRes); // 保存节奏数据
+      setStep(3);
     } catch (error) {
-      alert("Comparison failed.");
+      console.error(error);
+      alert("Comparison failed. Please check backend.");
       setStep(1);
     }
   };
@@ -82,6 +93,7 @@ function App() {
     setSampleFile(null); setSampleData(null);
     setPracticeFile(null); setPracticeData(null);
     setDtwResult(null);
+    setRhythmData(null); // 重置
     setCurrentTime(0);
     setActiveTrack(null);
     setStep(1);
@@ -95,8 +107,8 @@ function App() {
   const renderUploadStep = () => (
     <div className="animate-fade-in">
       <div className="app-header">
-        <h1>Music Evaluation Tool</h1>
-        <p>Upload a standard track and your practice recording to get a score.</p>
+        <h1> AI Piano Evaluator</h1>
+        <p>Upload your recording to compare with standard samples for AI scoring.</p>
       </div>
 
       <div className="upload-grid">
@@ -107,7 +119,7 @@ function App() {
           </div>
           <h3>1. Standard Sample</h3>
           <p>The teacher's demo</p>
-          
+
           <label className="file-label">
             {sampleFile ? "Change File" : "Upload MP3/WAV"}
             <input type="file" hidden accept="audio/*" onChange={(e) => handleUpload(e.target.files[0], 'sample')} />
@@ -121,22 +133,21 @@ function App() {
           {sampleFile && <span className="filename">{sampleFile.name}</span>}
         </div>
 
-        {/* Practice Card - 已修改按钮组 */}
+        {/* Practice Card */}
         <div className={`upload-card practice-theme ${practiceData ? 'completed' : ''}`}>
           <div className="icon-wrapper">
             <UploadCloud size={36} color="#3b82f6" strokeWidth={2} />
           </div>
           <h3>2. Your Practice</h3>
           <p>Your recording</p>
-          
+
           <label className="file-label">
             {practiceFile ? "Change File" : "Upload MP3/WAV"}
             <input type="file" hidden accept="audio/*" onChange={(e) => handleUpload(e.target.files[0], 'practice')} />
           </label>
 
           <div className="demo-divider"><span>OR</span></div>
-          
-          {/* 🆕 并排 Demo 按钮组 */}
+
           <div className="demo-btn-group">
             <button className="btn-demo-split" onClick={() => loadDemo('demo_practice.mp3', 'practice')}>
               <Sparkles size={14} /> Use Demo 1
@@ -160,42 +171,48 @@ function App() {
 
   const renderResultStep = () => (
     <div className="result-container animate-fade-in">
-      <ScorePanel 
-        dtwDistance={dtwResult.dtw_distance} 
+      <ScorePanel
+        dtwDistance={dtwResult.dtw_distance}
         sampleCount={sampleData.onset_count}
         practiceCount={practiceData.onset_count}
-        onReset={resetApp} 
+        onReset={resetApp}
       />
       <div className="dashboard-container">
         <div className="dashboard-inner">
           <div style={{ display: 'grid', gap: '25px' }}>
             <div className="track-section standard">
-              <span className="track-label">Standard Track (Green)</span>
-              <Waveform 
-                audioFile={sampleFile} 
-                color="#10b981" 
+              <span className="track-label">Standard Track (Cyan)</span>
+              <Waveform
+                audioFile={sampleFile}
+                // 👇 修改颜色为 Neon Cyan (#00f3ff)
+                color="#00f3ff"
                 onTimeUpdate={(t) => { if (activeTrack === 'sample' || !activeTrack) setCurrentTime(t); }}
                 onPlayingStateChange={(state) => handlePlayState(state, 'sample')}
               />
             </div>
+
             <div className="track-section practice">
-              <span className="track-label">Your Recording (Blue)</span>
-              <Waveform 
-                audioFile={practiceFile} 
-                color="#3b82f6"
-                onTimeUpdate={(t) => { if (activeTrack === 'practice' || !activeTrack) setCurrentTime(t); }} 
+              <span className="track-label">Your Recording (Magenta)</span>
+              <Waveform
+                audioFile={practiceFile}
+                // 👇 修改颜色为 Neon Magenta (#ff00ff)
+                color="#ff00ff"
+                onTimeUpdate={(t) => { if (activeTrack === 'practice' || !activeTrack) setCurrentTime(t); }}
                 onPlayingStateChange={(state) => handlePlayState(state, 'practice')}
               />
             </div>
           </div>
-          <PianoRollOverlay 
-            sampleOnsets={sampleData.onset_times} 
+
+          {/* 🆕 将 Rhythm Data 传递给 PianoRoll */}
+          <PianoRollOverlay
+            sampleOnsets={sampleData.onset_times}
             sampleMelody={sampleData.melody}
             practiceOnsets={practiceData.onset_times}
             practiceMelody={practiceData.melody}
+            rhythmSegments={rhythmData ? rhythmData.segments : []}
             currentTime={currentTime}
             activeTrack={activeTrack}
-            duration={Math.max(sampleData.duration, practiceData.duration)} 
+            duration={Math.max(sampleData.duration, practiceData.duration)}
           />
         </div>
       </div>
@@ -208,7 +225,7 @@ function App() {
       {step === 2 && (
         <div className="loading-container">
           <Loader2 size={80} color="#d946ef" className="animate-spin" style={{ filter: 'drop-shadow(0 0 10px #d946ef)' }} />
-          <h2 className="loading-text">Analyzing Cosmic Data...</h2>
+          <h2 className="loading-text">Analyzing Rhythm & Pitch...</h2>
         </div>
       )}
       {step === 3 && renderResultStep()}

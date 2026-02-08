@@ -2,47 +2,60 @@
 
 export const calculateResult = (dtwDistance, sampleCount, practiceCount) => {
   // 1. 基础防呆
+  // N/A 颜色改为较浅的蓝灰色，以便在深色背景下看清
   if (dtwDistance === null || dtwDistance === undefined || !sampleCount || !practiceCount || sampleCount === 0) {
-    return { grade: "N/A", color: "#94a3b8" };
+    return { grade: "N/A", color: "#94a3b8" }; 
   }
 
   // --- 核心算法 ---
   const avgError = dtwDistance / Math.min(sampleCount, practiceCount); // 每个音符的平均误差
 
-  // --- 🔽 调整 2: 宽松后的阈值表 ---
   let grade = "F";
-  let color = "#ef4444"; // Red
+  let color = "#ff2a6d"; // Default: Neon Red (Fail)
 
+  // --- 🔽 调整: 适配 Cyberpunk/Arcane 霓虹配色 ---
+  
+  // A Range: Cyber Cyan (赛博青 - 对应 Standard Track 的完美色)
   if (avgError <= 1.3) {
-    grade = "A+"; color = "#10b981"; // Emerald
+    grade = "A+"; color = "#00f3ff"; // Neon Cyan
   } else if (avgError <= 1.5) {
-    grade = "A";  color = "#10b981";
+    grade = "A";  color = "#00f3ff";
   } else if (avgError <= 1.7) {
-    grade = "A-"; color = "#10b981"; 
-  } else if (avgError <= 2.0) {
-    grade = "B+"; color = "#3b82f6"; // Blue
+    grade = "A-"; color = "#22d3ee"; // Slightly softer Cyan
+  } 
+  
+  // B Range: Neon Purple/Pink (霓虹紫 - 对应 Practice Track 的风格)
+  else if (avgError <= 2.0) {
+    grade = "B+"; color = "#d946ef"; // Neon Fuchsia
   } else if (avgError <= 2.3) {
-    grade = "B";  color = "#3b82f6"; 
+    grade = "B";  color = "#c026d3"; // Deep Neon Purple
   } else if (avgError <= 2.6) {
-    grade = "B-"; color = "#3b82f6"; 
-  } else if (avgError <= 3.0) {
-    grade = "C+"; color = "#f59e0b"; // Amber
+    grade = "B-"; color = "#a855f7"; // Lighter Purple
+  } 
+  
+  // C Range: Neon Gold/Yellow (流光金 - 警告)
+  else if (avgError <= 3.0) {
+    grade = "C+"; color = "#fcee0a"; // Neon Yellow
   } else if (avgError <= 3.4) {
-    grade = "C";  color = "#f59e0b";
+    grade = "C";  color = "#eab308"; // Gold
   } else if (avgError <= 3.8) {
-    // 🎯 Case 1 (2.01 + 惩罚) 即使到了 3.5-3.8 也会被这里接住，评为 C-
-    grade = "C-"; color = "#f59e0b";
-  } else if (avgError <= 4.8) {
-    // 🎯 Case 2 (2.54 + 惩罚) 会落在这里，评为 D
-    grade = "D";  color = "#f97316"; // Orange
-  } else {
-    grade = "F";  color = "#ef4444"; 
+    grade = "C-"; color = "#d97706"; // Amber
+  } 
+  
+  // D Range: Neon Orange (荧光橙 - 差)
+  else if (avgError <= 4.8) {
+    grade = "D";  color = "#ff9f43"; // Neon Orange
+  } 
+  
+  // F Range: Neon Red (赤红 - 失败)
+  else {
+    grade = "F";  color = "#ff2a6d"; // Radical Red
   }
 
   return { grade, color };
 };
 
-// 🔽 调整 3: 星星映射 (支持半星)
+// 🔽 星星映射 (保持不变)
 export const getStarCount = (grade) => {
   switch (grade) {
     case "A+": return 5;
@@ -53,7 +66,7 @@ export const getStarCount = (grade) => {
     case "B-": return 3;
     case "C+": return 2.5;
     case "C":  return 2;
-    case "C-": return 1.5; // 新增 C-
+    case "C-": return 1.5;
     case "D":  return 1;
     case "F":  return 0;
     default: return 0;

@@ -1,55 +1,245 @@
 /* src/components/ScorePanel.css */
+
+/* --- 核心容器 --- */
 .score-panel {
-  background: rgba(20, 10, 40, 0.85);
-  border-radius: 36px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.1);
-  margin-bottom: 50px;
+  position: relative;
+  
+  /* 背景图片 */
+  background-image: 
+    /* 1. 强化版渐变蒙版：左侧更黑，右侧透明度降低，中间过渡更柔和 */
+    linear-gradient(
+      90deg, 
+      rgba(5, 3, 10, 0.98) 0%,    /* 左侧极黑，保护文字 */
+      rgba(5, 3, 10, 0.85) 45%,   /* 文字区域依然较深 */
+      rgba(5, 3, 10, 0.3) 100%    /* 右侧透出钢琴 */
+    ),
+    url('/bg2.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #05030a; /* 兜底背景色 */
+
+  /* 混合模式：让蒙版更好地“染”在图片上，而不是发灰 */
+  background-blend-mode: normal, normal;
+
+  /* 边框与阴影 */
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  border-radius: 8px; /* 稍微硬朗一点 */
+  padding: 20px 30px; 
+  margin-bottom: 25px; 
+  overflow: hidden;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
 }
 
-.score-panel h2 {
-  color: #a78bfa; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+/* --- 背景装饰：科技网格 (降低透明度，作为纹理) --- */
+.cyber-bg-grid {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  opacity: 0.05; 
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
 }
 
-.score-circle {
-  width: 140px; height: 140px;
+/* --- 装饰：角落光标 --- */
+.cyber-corner {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-color: #d946ef; 
+  border-style: solid;
+  box-shadow: 0 0 8px #d946ef;
+  z-index: 1;
+  opacity: 0.9;
+}
+.top-left { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.top-right { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.bottom-left { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.bottom-right { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+/* --- 核心布局 --- */
+.score-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px; /* 稍微拉开一点间距 */
+}
+
+/* 左侧：等级区 */
+.grade-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+}
+
+/* 🆕 升级版：带缺口的霓虹圈 (Cyber Ring) */
+.grade-circle-glow {
+  width: 120px; height: 120px; /* 放大尺寸 */
+  display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  background: rgba(0,0,0,0.3);
-  display: flex; justify-content: center; align-items: center;
-  margin: 0 auto 10px auto;
-  border: 8px solid;
+  position: relative;
+  
+  /* 内圈：实线，带缺口 */
+  border: 4px solid var(--score-color);
+  border-left-color: transparent; /* 制造缺口 */
+  transform: rotate(-45deg); /* 旋转缺口位置 */
+  
+  background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, transparent 70%);
+  box-shadow: 0 0 20px var(--score-color), inset 0 0 20px var(--score-color);
+  margin-bottom: 15px;
 }
 
-.score-grade {
-  font-size: 5rem; font-weight: 900;
+/* 外圈装饰：虚线机械环 */
+.grade-circle-glow::after {
+  content: '';
+  position: absolute;
+  top: -12px; left: -12px; right: -12px; bottom: -12px;
+  border-radius: 50%;
+  border: 2px dashed var(--score-color);
+  opacity: 0.4;
+  animation: spinSlow 20s linear infinite;
 }
 
-/* 星星网格 */
-.stars-grid {
-  background: rgba(255,255,255,0.05);
-  border-radius: 20px;
-  padding: 20px;
-  max-width: 300px;
-  margin: 0 auto 30px auto;
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.star-row {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 10px;
+/* 等级文字 */
+.grade-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3.8rem;
+  font-weight: 900;
+  color: #fff;
+  /* 抵消父元素的旋转，让文字回正 */
+  transform: rotate(45deg); 
+  text-shadow: 0 0 25px var(--score-color);
+  /* 确保文字清晰 */
+  z-index: 2;
 }
-.star-row:last-child { margin-bottom: 0; }
 
-.star-label {
-  color: #e2e8f0; font-weight: 700; font-size: 1rem;
+.grade-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 4px;
+  margin-top: 5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
-.stars { display: flex; gap: 4px; }
 
+/* 右侧：信息区 */
+.info-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* 弱化分割线，依靠间距 */
+  border-left: 1px solid rgba(255,255,255,0.1);
+  padding-left: 40px;
+}
+
+.info-header {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7); /* 提高亮度 */
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.rating-wrapper {
+  align-self: flex-start;
+  margin-left: -20px;
+  margin-bottom: 8px;
+  /* 稍微放大能量条 */
+  transform: scale(1.0); 
+  transform-origin: left center;
+}
+
+/* 评价文字框：全息悬浮风格 */
+.feedback-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem; /* 稍微加大一点字号 */
+  font-weight: 700;
+  color: #fff;
+  font-style: italic; /* 倾斜字体增加速度感 */
+  
+  /* 🆕 1. 去除黑色背景，改为从左到右极淡的渐变，仅用于衬托文字 */
+  background: linear-gradient(
+    90deg, 
+    rgba(0, 0, 0, 0.6) 0%,    /* 左侧稍微深一点点，保证开头清晰 */
+    rgba(0, 0, 0, 0.2) 40%,   /* 中间快速变透明 */
+    transparent 100%          /* 右侧完全透明 */
+  );
+  
+  /* 🆕 2. 增加文字阴影，确保在亮背景上也能看清 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+
+  /* 布局调整 */
+  padding: 10px 20px;
+  /* 左侧动态亮条 */
+  border-left: 3px solid var(--score-color); 
+  margin: 15px 0 20px 0;
+  
+  /* 增加一点字间距 */
+  letter-spacing: 0.5px;
+  width: 100%;
+  
+  /* 移除之前的 box-shadow */
+  box-shadow: none;
+  
+  /* 可选：加一点磨砂效果，让背后的霓虹灯稍微模糊一点点，不抢戏 */
+  backdrop-filter: blur(2px);
+}
+
+/* 🆕 Retry 按钮 (实色版) */
 .retry-btn {
-  background: rgba(255,255,255,0.1); color: white;
-  padding: 12px 30px; border-radius: 50px; font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.2);
-  display: inline-flex; gap: 10px; transition: all 0.2s;
+  /* 常态：深色实心背景 */
+  background-color: #1a1625; 
+  color: #fff;
+  border: 1px solid var(--score-color); /* 动态边框色 */
+  
+  padding: 10px 30px;
+  font-size: 0.85rem;
+  border-radius: 2px;
+  transition: all 0.2s ease-in-out;
+  
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  
+  /* 增加常态下的发光感，避免太暗 */
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
-.retry-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* 🆕 Retry 按钮 (Hover) */
+.retry-btn:hover {
+  /* 悬停：背景变亮色，文字变黑 */
+  background-color: var(--score-color);
+  color: #000;
+  border-color: var(--score-color);
+  
+  font-weight: 700;
+  box-shadow: 0 0 25px var(--score-color);
+  transform: translateY(-2px);
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  .score-content { flex-direction: column; gap: 30px; }
+  .info-section { border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-left: 0; padding-top: 20px; width: 100%; align-items: center;}
+  .grade-circle-glow { width: 100px; height: 100px; }
+  .grade-text { font-size: 3rem; }
+  .rating-wrapper { align-self: center; margin-left: 0; transform-origin: center; }
+  .retry-btn { width: 100%; justify-content: center; }
+}

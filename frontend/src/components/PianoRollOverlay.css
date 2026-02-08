@@ -1,101 +1,217 @@
 /* src/components/PianoRollOverlay.css */
 
+/* --- 1. 局部变量定义 (只作用于此组件) --- */
 .piano-roll-container {
-  background: transparent; padding: 0; margin-top: 40px; color: #fff; border: none; box-shadow: none;
+  /* 基础音符色 (保持不变) */
+  --note-cyan: #00f3ff;
+  --note-magenta: #d946ef;
+
+  /* 🆕 微调后的节奏色 (Rhythm Colors) */
+  /* Steady: 偏绿的薄荷色，与 Standard 的青色区分开 */
+  --rh-steady: #00ffa3; 
+  --rh-steady-bg: rgba(0, 255, 163, 0.15);
+
+  /* Slow: 深绯红，比纯红更有质感 */
+  --rh-slow: #f50057;   
+  --rh-slow-bg: rgba(245, 0, 87, 0.15);
+
+  /* Fast: 日耀橙，代表“过热/过快” */
+  --rh-fast: #ff9100;   
+  --rh-fast-bg: rgba(255, 145, 0, 0.15);
+
+  margin-top: 50px;
+  position: relative;
+  font-family: 'Orbitron', sans-serif;
 }
 
+/* --- 2. 头部与图例 --- */
 .piano-roll-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
 }
+
 .piano-roll-header h3 {
-  font-size: 1.3rem; font-weight: 700; color: var(--text-muted-purple); text-transform: uppercase; letter-spacing: 1px;
+  color: #fff; 
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.6);
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  margin: 0;
 }
 
-/* 核心滚动区域：科幻屏幕 */
+.legend {
+  display: flex; gap: 15px;
+  background: rgba(0, 0, 0, 0.3); 
+  padding: 6px 18px; 
+  border-radius: 4px; /* 硬朗圆角 */
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(5px);
+}
+.legend-item { display: flex; align-items: center; font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 1px;}
+.legend-divider { color: rgba(255,255,255,0.2); font-size: 12px; margin: 0 5px; }
+
+/* 图例点样式 */
+.dot { width: 6px; height: 6px; margin-right: 8px; box-shadow: 0 0 8px currentColor; }
+.dot.sample-dot { background: var(--note-cyan); color: var(--note-cyan); }
+.dot.practice-dot { background: var(--note-magenta); color: var(--note-magenta); }
+
+/* 节奏图例块 (空心样式更高级) */
+.rhythm-neon-box { width: 6px; height: 6px; margin-right: 8px; border: 1px solid; background: transparent; box-shadow: 0 0 5px currentColor; }
+.rhythm-neon-box.slow { border-color: var(--rh-slow); color: var(--rh-slow); }
+.rhythm-neon-box.steady { border-color: var(--rh-steady); color: var(--rh-steady); }
+.rhythm-neon-box.fast { border-color: var(--rh-fast); color: var(--rh-fast); }
+
+
+/* --- 3. 核心滚动区域 (DAW Wrapper) --- */
 .daw-wrapper {
-  width: 100%; height: 380px; 
+  width: 100%; height: 480px;
   overflow-x: auto; overflow-y: hidden; position: relative;
-  background: #0d0416; /* 更深的屏幕底色 */
-  border-radius: 20px;
-  border: 3px solid rgba(99, 102, 241, 0.3); /* 发光边框 */
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(99, 102, 241, 0.2);
+  /* 背景改为极深的紫罗兰黑，与页面背景融合 */
+  background: #080512; 
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
+  
+  /* 增加全息扫描线背景纹理 */
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
-.daw-content { position: relative; }
 
-/* 网格：精细的科幻线条 */
+/* --- 4. 音符网格与样式 --- */
 .grid-row {
   position: absolute; left: 0; right: 0; width: 100%;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; padding-left: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex; align-items: center; padding-left: 8px;
 }
-.black-key { background-color: rgba(20, 10, 35, 0.6); }
-.white-key { background-color: transparent; }
-
-.key-label { font-size: 10px; color: var(--text-muted-purple); font-weight: 800; opacity: 0.7; }
+.black-key { background: rgba(255,255,255,0.02); }
+.key-label { font-size: 9px; color: rgba(255,255,255,0.2); font-family: 'Orbitron'; pointer-events: none; }
 
 .grid-vertical-line {
   position: absolute; top: 0; bottom: 0; width: 1px;
-  background-color: rgba(255, 255, 255, 0.08); pointer-events: none;
+  background: rgba(255, 255, 255, 0.05); pointer-events: none;
 }
-.time-label { position: absolute; top: 2px; left: 4px; font-size: 9px; color: var(--text-muted-purple); }
+.time-label { position: absolute; top: 2px; left: 4px; font-size: 9px; color: rgba(255,255,255,0.3); font-family: 'Orbitron'; }
 
-/* --- 音符块 (霓虹能量块) --- */
+
+/* --- 5. 音符块 (Neon Blocks) --- */
+/* 这里使用了之前的颜色，保持高亮 */
 .note-block {
-  position: absolute; border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  position: absolute; border-radius: 2px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 900;
-  transition: transform 0.05s, box-shadow 0.05s; 
+  border: 1px solid;
   backdrop-filter: blur(2px);
 }
 
-/* 🟢 Standard (Sample) -> 绿色霓虹 */
+/* Standard: Cyan */
 .note-block.sample {
-  background: rgba(16, 185, 129, 0.2); /* Emerald */
-  border: 1px solid var(--neon-green);
-  color: var(--neon-green);
-  box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
-  z-index: 1; 
+  border-color: var(--note-cyan);
+  background: rgba(0, 243, 255, 0.1);
+  box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
+  z-index: 2;
 }
 .note-block.sample.active-glow {
-  background: var(--neon-green); color: #000;
-  box-shadow: 0 0 25px var(--neon-green);
-  transform: scale(1.05); z-index: 50;
+  background: var(--note-cyan);
+  box-shadow: 0 0 20px var(--note-cyan); 
+  z-index: 50;
 }
 
-/* 🔵 Practice (You) -> 蓝色霓虹 */
+/* Practice: Magenta */
 .note-block.practice {
-  background: rgba(59, 130, 246, 0.3); /* Blue */
-  border: 1px solid var(--neon-blue);
-  color: var(--text-glow-light);
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  border-color: var(--note-magenta);
+  background: rgba(217, 70, 239, 0.1);
+  box-shadow: 0 0 5px rgba(217, 70, 239, 0.2);
   z-index: 10;
 }
 .note-block.practice.active-glow {
-  background: var(--neon-blue);
-  box-shadow: 0 0 30px var(--neon-blue);
-  border-color: #93c5fd; transform: scale(1.1); z-index: 50;
+  background: var(--note-magenta);
+  box-shadow: 0 0 20px var(--note-magenta); 
+  z-index: 51;
 }
-.note-text { pointer-events: none; text-shadow: 0 0 5px currentColor; }
 
-/* 播放头：激光束 */
+.note-text { display: none; } 
+
+/* 播放头 */
 .playhead {
-  position: absolute; top: 0; bottom: 0; width: 3px;
-  background: linear-gradient(to bottom, var(--neon-pink), var(--neon-purple)); /* 渐变激光 */
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: #fff;
   z-index: 100; pointer-events: none;
-  box-shadow: 0 0 15px var(--neon-pink);
-  will-change: left;
+  box-shadow: 0 0 15px #fff;
 }
 .playhead-cap {
-  width: 0; height: 0; 
-  border-left: 8px solid transparent; border-right: 8px solid transparent; 
-  border-top: 10px solid var(--neon-pink);
-  position: absolute; left: -6.5px; top: -2px;
-  filter: drop-shadow(0 0 5px var(--neon-pink));
+  width: 0; height: 0; position: absolute; left: -4px; top: 0;
+  border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 6px solid #fff;
 }
 
-/* 图例 */
-.legend { display: flex; gap: 15px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
-.dot { width: 12px; height: 12px; border-radius: 4px; margin-right: 8px; box-shadow: 0 0 5px currentColor; }
-.dot.sample-dot { background: var(--neon-green); border: none; } 
-.dot.practice-dot { background: var(--neon-blue); }
+
+/* --- 6. 节奏时间轴 (Visual Upgrade) --- */
+
+.rhythm-separator-title {
+  position: absolute; left: 12px;
+  font-family: 'Orbitron'; font-size: 9px; color: rgba(255,255,255,0.3);
+  letter-spacing: 2px; pointer-events: none;
+  text-transform: uppercase;
+}
+
+.rhythm-track-container {
+  position: absolute; left: 0;
+  /* 轨道背景更深，突出前景块 */
+  background: rgba(0,0,0,0.6);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 节奏块：增加纹理，不再是纯色 */
+.rhythm-block {
+  position: absolute; top: 6px; bottom: 6px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 2px;
+  transition: 0.2s;
+  
+  /* 核心：使用条纹纹理模拟数据流 */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.5) 3px
+  );
+  
+  /* 底部亮条，模拟进度条感 */
+  border-bottom: 2px solid;
+  border-top: 0; border-left: 0; border-right: 0;
+}
+
+/* 🟥 Slow (Crimson) */
+.rhythm-block.rhythm-slow {
+  background-color: var(--rh-slow-bg);
+  border-bottom-color: var(--rh-slow);
+  color: var(--rh-slow);
+  box-shadow: inset 0 -5px 10px rgba(245, 0, 87, 0.2);
+}
+
+/* 🟩 Steady (Mint Green) */
+.rhythm-block.rhythm-steady {
+  background-color: var(--rh-steady-bg);
+  border-bottom-color: var(--rh-steady);
+  color: var(--rh-steady);
+  box-shadow: inset 0 -5px 10px rgba(0, 255, 163, 0.2);
+}
+
+/* 🟧 Fast (Solar Orange) */
+.rhythm-block.rhythm-fast {
+  background-color: var(--rh-fast-bg);
+  border-bottom-color: var(--rh-fast);
+  color: var(--rh-fast);
+  box-shadow: inset 0 -5px 10px rgba(255, 145, 0, 0.2);
+}
+
+/* 文字样式：微弱发光 */
+.rhythm-text {
+  font-family: 'Orbitron'; font-size: 9px; font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px currentColor;
+  opacity: 0.9;
+}
